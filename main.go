@@ -12,7 +12,7 @@ import (
 
 func main() {
 	fmt.Println("Launch services")
-	renderer.Init()
+	backend.Init()
 
 	r := api.CreateRouter()
 	httpTimeout := flag.Int("http-timeout", 10, "timeout on http connections (in seconds)")

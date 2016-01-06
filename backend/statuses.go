@@ -12,21 +12,21 @@ const (
 )
 
 type Color struct {
-	red   int
-	green int
-	blue  int
+	Red   int
+	Green int
+	Blue  int
 }
 
-type status struct {
+type Status struct {
 	ledIndex     int
-	currentColor color
+	currentColor Color
 	mode         Mode
-	frenquency   int
+	frequency   int
 }
 
-var leds [1500]status
+var leds [1500]Status
 
-func ChangeStatus(ledIndex int, setColor color, setMode mode, setFrequency frequency) status {
+func ChangeStatus(ledIndex int, setColor Color, setMode Mode, setFrequency int) Status {
 	var led = leds[ledIndex]
 
 	led.ledIndex = ledIndex
@@ -38,13 +38,14 @@ func ChangeStatus(ledIndex int, setColor color, setMode mode, setFrequency frequ
 	return led
 }
 
-func getStatus(ledIndex int) status {
+func GetStatusAlone(ledIndex int) Status {
 	return leds[ledIndex]
 }
 
-func getStatus(from int, to int) []status {
+func GetStatus(from int, to int) []Status {
 	numberOfLeds := to - from
-	var statuses [numberOfLeds]status
+	var statuses []Status
+	statuses = make([]Status, numberOfLeds)
 
 	for i := 0; i < numberOfLeds; i = i + 1 {
 		statuses[i] = leds[i+from]

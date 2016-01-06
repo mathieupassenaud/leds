@@ -4,6 +4,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mathieupassenaud/leds/backend"
 	"net/http"
+	"io"
+	"io/ioutil"
+	"encoding/json"
+	"fmt"
 )
 
 func CreateRouter() *mux.Router {
@@ -29,13 +33,16 @@ func NewHttpSetHandler() *HttpSetHandler {
 }
 
 type inputJson struct {
-	leds []struct {
-		index int `json:"index"`
-		red   int `json:"red"`
-		green int `json:"green"`
-		blue  int `json:"blue"`
-	}
+	Leds []singleLed `json:"array"`
 }
+
+type singleLed struct {
+	Index int `json:"index"`
+	Red   int `json:"red"`
+	Green int `json:"green"`
+	Blue  int `json:"blue"`
+}
+
 
 func (handler *HttpSetHandler) HandlePost(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -45,13 +52,15 @@ func (handler *HttpSetHandler) HandlePost(w http.ResponseWriter, r *http.Request
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
+	fmt.Println(string(body))
 	input := inputJson{}
 	json.Unmarshal(body, &input)
-	for i := 0; i < len(input.leds); i = i + 1 {
-		s := statuses.ChangeStatus(input.leds[i].index, statuses.Color{input.leds[i].red, input.leds[i].green, input.leds[i].blue}, 1, 0)
-		renderer.Apply(s)
+	fmt.Println(input);
+	for i := 0; i < len(input.Leds); i = i + 1 {
+		s := backend.ChangeStatus(input.Leds[i].Index, backend.Color{Red: input.Leds[i].Red, Green: input.Leds[i].Green, Blue: input.Leds[i].Blue}, 1, 0)
+		backend.Apply(s)
 	}
-	renderer.ForceRender()
+	backend.ForceRender()
 }
 
 type HttpAlertHandler struct {
